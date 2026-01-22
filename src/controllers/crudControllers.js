@@ -1,5 +1,6 @@
 // This file contains simple CRUD controllers for models that follow standard patterns
 const Program = require('../models/Program');
+const Team = require('../models/Team');
 const Partner = require('../models/Partner');
 const Opportunity = require('../models/Opportunity');
 const ImpactStory = require('../models/ImpactStory');
