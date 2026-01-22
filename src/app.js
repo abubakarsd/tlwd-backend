@@ -57,7 +57,7 @@ app.use('/api/admin/partners', createCRUDRoutes(partnerController, 'logo'));
 app.use('/api/admin/opportunities', createCRUDRoutes(opportunityController));
 app.use('/api/admin/applications', require('./routes/admin/applications'));
 app.use('/api/admin/donations', require('./routes/admin/donations'));
-app.use('/api/admin/resources', createCRUDRoutes(resourceController));
+app.use('/api/admin/resources', createCRUDRoutes(resourceController, 'file'));
 app.use('/api/admin/subscribers', require('./routes/admin/subscribers'));
 app.use('/api/admin/dashboard', require('./routes/admin/dashboard'));
 app.use('/api/admin/media', require('./routes/admin/media'));
