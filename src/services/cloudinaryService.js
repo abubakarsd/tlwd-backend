@@ -4,7 +4,7 @@ const { Readable } = require('stream');
 /**
  * Upload image to Cloudinary
  */
-const uploadImage = async (fileBuffer, folder = 'tlwd') => {
+const uploadImage = async (fileBuffer, folder = 'TLWDF') => {
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
             {
@@ -45,7 +45,7 @@ const deleteImage = async (publicId) => {
 /**
  * Upload multiple images
  */
-const uploadMultipleImages = async (files, folder = 'tlwd') => {
+const uploadMultipleImages = async (files, folder = 'TLWDF') => {
     const uploadPromises = files.map(file => uploadImage(file.buffer, folder));
     return Promise.all(uploadPromises);
 };

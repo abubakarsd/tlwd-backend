@@ -1,8 +1,10 @@
 const Blog = require('../models/Blog');
 const Comment = require('../models/Comment');
+const Subscriber = require('../models/Subscriber');
 const { successResponse, errorResponse, paginatedResponse } = require('../utils/response');
 const { getPagination, getPaginationData } = require('../utils/pagination');
 const { uploadImage, deleteImage } = require('../services/cloudinaryService');
+const { sendNewsletterBroadcast } = require('../services/emailService');
 
 /**
  * @route   GET /api/admin/blog
@@ -59,6 +61,27 @@ exports.createBlogPost = async (req, res) => {
             ...imageData,
         });
 
+        // Send newsletter if post is published
+        if (status === 'Published') {
+            try {
+                const subscribers = await Subscriber.find({ status: 'Active' });
+                if (subscribers.length > 0) {
+                    // Create excerpt from content (strip HTML and limit to 200 chars)
+                    const excerpt = content.replace(/<[^>]*>/g, '').substring(0, 200) + '...';
+
+                    await sendNewsletterBroadcast({
+                        title,
+                        excerpt,
+                        slug: post.slug,
+                        subscribers,
+                    });
+                }
+            } catch (emailError) {
+                console.error('Newsletter send error:', emailError);
+                // Don't fail the request if email fails
+            }
+        }
+
         successResponse(res, post, 'Blog post created successfully', 201);
     } catch (error) {
         errorResponse(res, error.message, 500);
@@ -79,12 +102,13 @@ exports.updateBlogPost = async (req, res) => {
         }
 
         const { title, author, category, status, content } = req.body;
+        const wasPublished = post.status === 'Published';
 
         if (req.file) {
             if (post.imagePublicId) {
                 await deleteImage(post.imagePublicId);
             }
-            const uploaded = await uploadImage(req.file.buffer, 'blog');
+            const uploaded = await uploadImage(req.file.buffer, 'TLWDF/blog');
             post.image = uploaded.url;
             post.imagePublicId = uploaded.publicId;
         }
@@ -96,6 +120,25 @@ exports.updateBlogPost = async (req, res) => {
         post.content = content || post.content;
 
         await post.save();
+
+        // Send newsletter if post is newly published (was Draft, now Published)
+        if (!wasPublished && post.status === 'Published') {
+            try {
+                const subscribers = await Subscriber.find({ status: 'Active' });
+                if (subscribers.length > 0) {
+                    const excerpt = post.content.replace(/<[^>]*>/g, '').substring(0, 200) + '...';
+
+                    await sendNewsletterBroadcast({
+                        title: post.title,
+                        excerpt,
+                        slug: post.slug,
+                        subscribers,
+                    });
+                }
+            } catch (emailError) {
+                console.error('Newsletter send error:', emailError);
+            }
+        }
 
         successResponse(res, post, 'Blog post updated successfully');
     } catch (error) {

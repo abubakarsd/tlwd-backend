@@ -129,7 +129,7 @@ exports.submitApplication = async (req, res) => {
         // Upload CV if provided
         let cvData = {};
         if (req.file) {
-            const uploaded = await uploadImage(req.file.buffer, 'applications');
+            const uploaded = await uploadImage(req.file.buffer, 'TLWDF/applications');
             cvData = {
                 cv: uploaded.url,
                 cvPublicId: uploaded.publicId,

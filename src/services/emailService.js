@@ -99,9 +99,52 @@ const sendNewsletterWelcome = async (email) => {
     }
 };
 
+/**
+ * Send newsletter broadcast for new blog post
+ */
+const sendNewsletterBroadcast = async ({ title, excerpt, slug, subscribers }) => {
+    try {
+        const blogUrl = `${process.env.FRONTEND_URL}/blog/${slug}`;
+
+        // Send to all subscribers (Resend supports batch sending)
+        const emailPromises = subscribers.map(subscriber =>
+            resend.emails.send({
+                from: 'TLWD Foundation <noreply@tlwd.org>',
+                to: subscriber.email,
+                subject: `New Post: ${title}`,
+                html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">New Blog Post from TLWD Foundation</h2>
+            <h3 style="color: #0066cc;">${title}</h3>
+            <p style="color: #666; line-height: 1.6;">${excerpt}</p>
+            <a href="${blogUrl}" style="display: inline-block; padding: 12px 24px; background-color: #0066cc; color: white; text-decoration: none; border-radius: 5px; margin-top: 16px;">Read More</a>
+            <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;">
+            <p style="color: #999; font-size: 12px;">
+              You're receiving this email because you subscribed to TLWD Foundation's newsletter.
+              <br>
+              <a href="${process.env.FRONTEND_URL}/unsubscribe?email=${subscriber.email}" style="color: #999;">Unsubscribe</a>
+            </p>
+          </div>
+        `,
+            })
+        );
+
+        const results = await Promise.allSettled(emailPromises);
+
+        // Count successful sends
+        const successful = results.filter(r => r.status === 'fulfilled').length;
+        const failed = results.filter(r => r.status === 'rejected').length;
+
+        return { successful, failed, total: subscribers.length };
+    } catch (error) {
+        throw error;
+    }
+};
+
 module.exports = {
     sendContactEmail,
     sendApplicationConfirmation,
     sendDonationReceipt,
     sendNewsletterWelcome,
+    sendNewsletterBroadcast,
 };
