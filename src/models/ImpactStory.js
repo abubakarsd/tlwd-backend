@@ -14,7 +14,7 @@ const impactStorySchema = new mongoose.Schema({
         required: [true, 'Category is required'],
     },
     year: {
-        type: Number,
+        type: Date,
         required: [true, 'Year is required'],
     },
     outcome: {
