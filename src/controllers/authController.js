@@ -104,3 +104,34 @@ exports.refreshToken = async (req, res) => {
         errorResponse(res, error.message, 500);
     }
 };
+
+/**
+ * @route   PUT /api/auth/password
+ * @desc    Update password
+ * @access  Private
+ */
+exports.updatePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+
+        const user = await User.findById(req.user.id).select('+password');
+
+        if (!user) {
+            return errorResponse(res, 'User not found', 404);
+        }
+
+        // Check current password
+        const isMatch = await user.comparePassword(currentPassword);
+
+        if (!isMatch) {
+            return errorResponse(res, 'Invalid current password', 401);
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        successResponse(res, null, 'Password updated successfully');
+    } catch (error) {
+        errorResponse(res, error.message, 500);
+    }
+};

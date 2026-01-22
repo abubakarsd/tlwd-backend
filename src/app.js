@@ -60,6 +60,8 @@ app.use('/api/admin/donations', require('./routes/admin/donations'));
 app.use('/api/admin/resources', createCRUDRoutes(resourceController));
 app.use('/api/admin/subscribers', require('./routes/admin/subscribers'));
 app.use('/api/admin/dashboard', require('./routes/admin/dashboard'));
+app.use('/api/admin/media', require('./routes/admin/media'));
+app.use('/api/admin/settings', require('./routes/admin/settings'));
 
 // Public routes
 app.use('/api/hero-slides', require('./routes/public/heroSlides'));
