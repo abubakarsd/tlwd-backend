@@ -7,7 +7,7 @@ const opportunitySchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['Job', 'Volunteer'],
+        enum: ['Job', 'Volunteer', 'Internship', 'Fellowship'],
         required: [true, 'Type is required'],
     },
     location: {
@@ -20,8 +20,8 @@ const opportunitySchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['open', 'closed'],
-        default: 'open',
+        enum: ['Open', 'Closed'],
+        default: 'Open',
     },
     description: {
         type: String,
