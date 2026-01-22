@@ -70,7 +70,7 @@ app.use('/api/admin/settings', require('./routes/admin/settings'));
 // Public routes
 app.use('/api/hero-slides', require('./routes/public/heroSlides'));
 app.use('/api/settings', require('./routes/public/settings'));
-app.use('/api/programs', createPublicRoutes(programController));
+app.use('/api/impact-counts', createPublicRoutes(impactCountController));
 app.use('/api/priorities', createPublicRoutes(priorityController)); // Add this
 app.use('/api/values', createPublicRoutes(valueController));
 app.use('/api/impact-stories', createPublicRoutes(impactStoryController));
