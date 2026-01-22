@@ -1,10 +1,9 @@
 // This file contains simple CRUD controllers for models that follow standard patterns
-const Program = require('../models/Program');
-const Team = require('../models/Team');
 const Partner = require('../models/Partner');
-const Opportunity = require('../models/Opportunity');
-const ImpactStory = require('../models/ImpactStory');
 const Resource = require('../models/Resource');
+const Priority = require('../models/Priority');
+const Value = require('../models/Value');
+const Media = require('../models/Media');
 const { successResponse, errorResponse, paginatedResponse } = require('../utils/response');
 const { getPagination, getPaginationData } = require('../utils/pagination');
 const { uploadImage, deleteImage, uploadMultipleImages } = require('../services/cloudinaryService');
@@ -145,4 +144,6 @@ module.exports = {
     opportunityController: createCRUDController(Opportunity, 'Opportunity', 'opportunities'),
     impactStoryController: createCRUDController(ImpactStory, 'Impact Story', 'impact-stories'),
     resourceController: createCRUDController(Resource, 'Resource', 'resources', 'file'),
+    priorityController: createCRUDController(Priority, 'Priority', 'priorities'),
+    valueController: createCRUDController(Value, 'Value', 'values'),
 };

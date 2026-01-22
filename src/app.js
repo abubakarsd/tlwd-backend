@@ -42,6 +42,8 @@ const {
     opportunityController,
     impactStoryController,
     resourceController,
+    priorityController,
+    valueController,
 } = require('./controllers/crudControllers');
 
 // Auth routes
@@ -50,6 +52,8 @@ app.use('/api/auth', require('./routes/auth'));
 // Admin routes
 app.use('/api/admin/hero-slides', require('./routes/admin/heroSlides'));
 app.use('/api/admin/programs', createCRUDRoutes(programController));
+app.use('/api/admin/priorities', createCRUDRoutes(priorityController)); // Add this
+app.use('/api/admin/values', createCRUDRoutes(valueController));
 app.use('/api/admin/impact-stories', createCRUDRoutes(impactStoryController));
 app.use('/api/admin/blog', require('./routes/admin/blog'));
 app.use('/api/admin/team', createCRUDRoutes(teamController));
@@ -67,6 +71,8 @@ app.use('/api/admin/settings', require('./routes/admin/settings'));
 app.use('/api/hero-slides', require('./routes/public/heroSlides'));
 app.use('/api/settings', require('./routes/public/settings'));
 app.use('/api/programs', createPublicRoutes(programController));
+app.use('/api/priorities', createPublicRoutes(priorityController)); // Add this
+app.use('/api/values', createPublicRoutes(valueController));
 app.use('/api/impact-stories', createPublicRoutes(impactStoryController));
 app.use('/api/blog', require('./routes/public/blog'));
 app.use('/api/team', createPublicRoutes(teamController));
