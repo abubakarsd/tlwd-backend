@@ -12,6 +12,12 @@ const programSchema = new mongoose.Schema({
     icon: {
         type: String,
     },
+    image: {
+        type: String,
+    },
+    imagePublicId: {
+        type: String,
+    },
     status: {
         type: String,
         enum: ['active', 'inactive'],
