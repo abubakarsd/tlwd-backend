@@ -51,7 +51,7 @@ exports.createHeroSlide = async (req, res) => {
             title,
             subtitle,
             category,
-            status,
+            status: status ? status.toLowerCase() : undefined,
             order,
             ...imageData,
         });
@@ -92,7 +92,7 @@ exports.updateHeroSlide = async (req, res) => {
         slide.title = title || slide.title;
         slide.subtitle = subtitle || slide.subtitle;
         slide.category = category || slide.category;
-        slide.status = status || slide.status;
+        slide.status = status ? status.toLowerCase() : slide.status;
         slide.order = order !== undefined ? order : slide.order;
 
         await slide.save();
