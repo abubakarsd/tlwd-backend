@@ -10,7 +10,7 @@ const { getPagination, getPaginationData } = require('../utils/pagination');
 const { uploadImage, deleteImage, uploadMultipleImages } = require('../services/cloudinaryService');
 
 // Generic CRUD factory
-const createCRUDController = (Model, modelName, folder) => ({
+const createCRUDController = (Model, modelName, folder, dbField = 'image') => ({
     getAll: async (req, res) => {
         try {
             const { page, limit } = req.query;
@@ -36,8 +36,8 @@ const createCRUDController = (Model, modelName, folder) => ({
             if (req.file) {
                 const uploaded = await uploadImage(req.file.buffer, folder);
                 imageData = {
-                    [folder === 'partners' ? 'logo' : 'image']: uploaded.url,
-                    [folder === 'partners' ? 'logoPublicId' : 'imagePublicId']: uploaded.publicId,
+                    [folder === 'partners' ? 'logo' : dbField]: uploaded.url,
+                    [folder === 'partners' ? 'logoPublicId' : `${dbField}PublicId`]: uploaded.publicId,
                 };
             }
 
@@ -61,12 +61,13 @@ const createCRUDController = (Model, modelName, folder) => ({
             }
 
             if (req.file) {
-                const publicIdField = folder === 'partners' ? 'logoPublicId' : 'imagePublicId';
+                const publicIdField = folder === 'partners' ? 'logoPublicId' : `${dbField}PublicId`;
                 if (item[publicIdField]) {
                     await deleteImage(item[publicIdField]);
                 }
                 const uploaded = await uploadImage(req.file.buffer, folder);
-                item[folder === 'partners' ? 'logo' : 'image'] = uploaded.url;
+                const urlField = folder === 'partners' ? 'logo' : dbField;
+                item[urlField] = uploaded.url;
                 item[publicIdField] = uploaded.publicId;
             }
 
@@ -91,7 +92,7 @@ const createCRUDController = (Model, modelName, folder) => ({
                 return errorResponse(res, `${modelName} not found`, 404);
             }
 
-            const publicIdField = folder === 'partners' ? 'logoPublicId' : 'imagePublicId';
+            const publicIdField = folder === 'partners' ? 'logoPublicId' : `${dbField}PublicId`;
             if (item[publicIdField]) {
                 await deleteImage(item[publicIdField]);
             }
@@ -113,7 +114,8 @@ const createCRUDController = (Model, modelName, folder) => ({
                 filter.type = req.query.type;
             }
 
-            const items = await Model.find(filter).select('-imagePublicId -logoPublicId');
+            const publicIdField = folder === 'partners' ? 'logoPublicId' : `${dbField}PublicId`;
+            const items = await Model.find(filter).select(`-${publicIdField}`);
             successResponse(res, items);
         } catch (error) {
             errorResponse(res, error.message, 500);
@@ -122,7 +124,7 @@ const createCRUDController = (Model, modelName, folder) => ({
 
     getPublicById: async (req, res) => {
         try {
-            const item = await Model.findById(req.params.id).select('-imagePublicId -logoPublicId');
+            const item = await Model.findById(req.params.id).select(folder === 'partners' ? '-logoPublicId' : `-${dbField}PublicId`);
 
             if (!item) {
                 return errorResponse(res, `${modelName} not found`, 404);
@@ -142,5 +144,5 @@ module.exports = {
     partnerController: createCRUDController(Partner, 'Partner', 'partners'),
     opportunityController: createCRUDController(Opportunity, 'Opportunity', 'opportunities'),
     impactStoryController: createCRUDController(ImpactStory, 'Impact Story', 'impact-stories'),
-    resourceController: createCRUDController(Resource, 'Resource', 'resources'),
+    resourceController: createCRUDController(Resource, 'Resource', 'resources', 'file'),
 };
