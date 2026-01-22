@@ -11,7 +11,8 @@ const teamSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['Team', 'Board', 'Advisory'],
+        enum: ['Team Member', 'Director', 'Board', 'Advisory', 'Team'], // Keeping 'Team' for backward compatibility if needed
+        default: 'Team Member',
         required: [true, 'Type is required'],
     },
     image: {
@@ -26,6 +27,8 @@ const teamSchema = new mongoose.Schema({
     socialLinks: {
         linkedin: String,
         twitter: String,
+        instagram: String,
+        facebook: String,
         email: String,
     },
 }, {
