@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 const createCRUDRoutes = require('./routes/admin/crudRoutes');
 const createPublicRoutes = require('./routes/public/publicRoutes');
 const {
-    programController,
+    impactCountController,
     teamController,
     partnerController,
     opportunityController,
@@ -51,7 +51,7 @@ app.use('/api/auth', require('./routes/auth'));
 
 // Admin routes
 app.use('/api/admin/hero-slides', require('./routes/admin/heroSlides'));
-app.use('/api/admin/programs', createCRUDRoutes(programController));
+app.use('/api/admin/impact-counts', createCRUDRoutes(impactCountController));
 app.use('/api/admin/priorities', createCRUDRoutes(priorityController)); // Add this
 app.use('/api/admin/values', createCRUDRoutes(valueController));
 app.use('/api/admin/impact-stories', createCRUDRoutes(impactStoryController));

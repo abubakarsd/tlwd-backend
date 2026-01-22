@@ -3,14 +3,18 @@ const mongoose = require('mongoose');
 const programSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'Program name is required'],
+        required: [true, 'Title is required'],
     },
     description: {
         type: String,
-        required: [true, 'Description is required'],
+    },
+    count: {
+        type: String,
+        required: [true, 'Count value is required'],
     },
     icon: {
         type: String,
+        default: 'Target',
     },
     image: {
         type: String,
@@ -27,4 +31,4 @@ const programSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-module.exports = mongoose.model('Program', programSchema);
+module.exports = mongoose.model('ImpactCount', programSchema);

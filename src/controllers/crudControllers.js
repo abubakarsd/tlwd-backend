@@ -1,5 +1,5 @@
 // This file contains simple CRUD controllers for models that follow standard patterns
-const Program = require('../models/Program');
+const ImpactCount = require('../models/ImpactCount');
 const Team = require('../models/Team');
 const Partner = require('../models/Partner');
 const Opportunity = require('../models/Opportunity');
@@ -142,7 +142,7 @@ const createCRUDController = (Model, modelName, folder, dbField = 'image') => ({
 
 // Export controllers for each model
 module.exports = {
-    programController: createCRUDController(Program, 'Program', 'programs'),
+    impactCountController: createCRUDController(ImpactCount, 'Impact Count', 'impact-counts'),
     teamController: createCRUDController(Team, 'Team Member', 'team'),
     partnerController: createCRUDController(Partner, 'Partner', 'partners'),
     opportunityController: createCRUDController(Opportunity, 'Opportunity', 'opportunities'),
