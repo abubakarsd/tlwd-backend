@@ -20,8 +20,8 @@ const opportunitySchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Open', 'Closed'],
-        default: 'Open',
+        enum: ['open', 'closed'],
+        default: 'open',
     },
     description: {
         type: String,
