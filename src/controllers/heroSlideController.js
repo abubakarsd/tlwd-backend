@@ -40,7 +40,7 @@ exports.createHeroSlide = async (req, res) => {
         // Upload image if provided
         let imageData = {};
         if (req.file) {
-            const uploaded = await uploadImage(req.file.buffer, 'hero-slides');
+            const uploaded = await uploadImage(req.file.buffer, 'TLWDF/hero-slides');
             imageData = {
                 image: uploaded.url,
                 imagePublicId: uploaded.publicId,
@@ -84,7 +84,7 @@ exports.updateHeroSlide = async (req, res) => {
                 await deleteImage(slide.imagePublicId);
             }
 
-            const uploaded = await uploadImage(req.file.buffer, 'hero-slides');
+            const uploaded = await uploadImage(req.file.buffer, 'TLWDF/hero-slides');
             slide.image = uploaded.url;
             slide.imagePublicId = uploaded.publicId;
         }
