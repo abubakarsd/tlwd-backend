@@ -44,6 +44,7 @@ const {
     resourceController,
     priorityController,
     valueController,
+    testimonialController,
 } = require('./controllers/crudControllers');
 
 // Auth routes
@@ -54,6 +55,7 @@ app.use('/api/admin/hero-slides', require('./routes/admin/heroSlides'));
 app.use('/api/admin/impact-counts', createCRUDRoutes(impactCountController));
 app.use('/api/admin/priorities', createCRUDRoutes(priorityController)); // Add this
 app.use('/api/admin/values', createCRUDRoutes(valueController));
+app.use('/api/admin/testimonials', createCRUDRoutes(testimonialController));
 app.use('/api/admin/impact-stories', createCRUDRoutes(impactStoryController));
 app.use('/api/admin/blog', require('./routes/admin/blog'));
 app.use('/api/admin/team', createCRUDRoutes(teamController));
@@ -73,6 +75,7 @@ app.use('/api/settings', require('./routes/public/settings'));
 app.use('/api/impact-counts', createPublicRoutes(impactCountController));
 app.use('/api/priorities', createPublicRoutes(priorityController)); // Add this
 app.use('/api/values', createPublicRoutes(valueController));
+app.use('/api/testimonials', createPublicRoutes(testimonialController));
 app.use('/api/impact-stories', createPublicRoutes(impactStoryController));
 app.use('/api/blog', require('./routes/public/blog'));
 app.use('/api/team', createPublicRoutes(teamController));

@@ -7,6 +7,7 @@ const ImpactStory = require('../models/ImpactStory');
 const Resource = require('../models/Resource');
 const Priority = require('../models/Priority');
 const Value = require('../models/Value');
+const Testimonial = require('../models/Testimonial');
 const Media = require('../models/Media');
 const { successResponse, errorResponse, paginatedResponse } = require('../utils/response');
 const { getPagination, getPaginationData } = require('../utils/pagination');
@@ -150,4 +151,5 @@ module.exports = {
     resourceController: createCRUDController(Resource, 'Resource', 'resources', 'file'),
     priorityController: createCRUDController(Priority, 'Priority', 'priorities'),
     valueController: createCRUDController(Value, 'Value', 'values'),
+    testimonialController: createCRUDController(Testimonial, 'Testimonial', 'testimonials'),
 };
