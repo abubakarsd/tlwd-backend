@@ -5,9 +5,6 @@ const programSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Title is required'],
     },
-    description: {
-        type: String,
-    },
     count: {
         type: String,
         required: [true, 'Count value is required'],
@@ -15,12 +12,6 @@ const programSchema = new mongoose.Schema({
     icon: {
         type: String,
         default: 'Target',
-    },
-    image: {
-        type: String,
-    },
-    imagePublicId: {
-        type: String,
     },
     status: {
         type: String,
