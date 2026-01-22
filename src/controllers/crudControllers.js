@@ -41,6 +41,10 @@ const createCRUDController = (Model, modelName, folder) => ({
                 };
             }
 
+            if (req.body.status) {
+                req.body.status = req.body.status.toLowerCase();
+            }
+
             const item = await Model.create({ ...req.body, ...imageData });
             successResponse(res, item, `${modelName} created successfully`, 201);
         } catch (error) {
@@ -68,7 +72,7 @@ const createCRUDController = (Model, modelName, folder) => ({
 
             Object.keys(req.body).forEach(key => {
                 if (req.body[key] !== undefined) {
-                    item[key] = req.body[key];
+                    item[key] = key === 'status' ? req.body[key].toLowerCase() : req.body[key];
                 }
             });
 
