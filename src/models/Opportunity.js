@@ -30,6 +30,19 @@ const opportunitySchema = new mongoose.Schema({
     requirements: [{
         type: String,
     }],
+    image: {
+        type: String,
+    },
+    imagePublicId: {
+        type: String,
+    },
+    isExternal: {
+        type: Boolean,
+        default: false,
+    },
+    externalLink: {
+        type: String,
+    },
 }, {
     timestamps: true,
 });
