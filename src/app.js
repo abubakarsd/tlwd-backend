@@ -24,10 +24,15 @@ app.use(cors({
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
 
-        if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes(origin)) {
+        const isAllowed = allowedOrigins.includes(origin);
+
+        if (isAllowed) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            console.warn(`Blocked by CORS: ${origin}`);
+            // In development, you might want to allow everything, but for now we follow the strict list
+            // We return callback(null, false) instead of callback(new Error(...)) to avoid 500 errors
+            callback(null, false);
         }
     },
     credentials: true,
