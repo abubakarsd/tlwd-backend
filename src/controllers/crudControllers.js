@@ -46,7 +46,7 @@ const createCRUDController = (Model, modelName, folder, dbField = 'image') => ({
             }
 
             if (req.body.status) {
-                req.body.status = req.body.status.toLowerCase();
+                // req.body.status = req.body.status.toLowerCase();
             }
 
             const item = await Model.create({ ...req.body, ...imageData });
@@ -77,7 +77,7 @@ const createCRUDController = (Model, modelName, folder, dbField = 'image') => ({
 
             Object.keys(req.body).forEach(key => {
                 if (req.body[key] !== undefined) {
-                    item[key] = key === 'status' ? req.body[key].toLowerCase() : req.body[key];
+                    item[key] = key === 'status' ? req.body[key] : req.body[key];
                 }
             });
 
@@ -112,7 +112,7 @@ const createCRUDController = (Model, modelName, folder, dbField = 'image') => ({
         try {
             const filter = {};
             if (Model.schema.path('status')) {
-                filter.status = req.query.status || 'active';
+                filter.status = req.query.status || (Model.modelName === 'Opportunity' ? 'Open' : 'Active');
             }
             if (Model.schema.path('type') && req.query.type) {
                 filter.type = req.query.type;
