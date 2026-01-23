@@ -8,7 +8,7 @@ const { successResponse, errorResponse } = require('../utils/response');
  */
 exports.getActiveHeroSlides = async (req, res) => {
     try {
-        const slides = await HeroSlide.find({ status: 'active' })
+        const slides = await HeroSlide.find({ status: { $in: ['Active', 'active'] } })
             .sort({ order: 1 })
             .select('-imagePublicId');
 

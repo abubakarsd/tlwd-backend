@@ -112,7 +112,10 @@ const createCRUDController = (Model, modelName, folder, dbField = 'image') => ({
         try {
             const filter = {};
             if (Model.schema.path('status')) {
-                filter.status = req.query.status || (Model.modelName === 'Opportunity' ? 'Open' : 'Active');
+                const defaultStatus = Model.modelName === 'Opportunity' ? 'Open' : 'Active';
+                const status = req.query.status || defaultStatus;
+                // Support both capitalized and lowercase for backward compatibility
+                filter.status = { $in: [status, status.toLowerCase()] };
             }
             if (Model.schema.path('type') && req.query.type) {
                 filter.type = req.query.type;
