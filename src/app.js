@@ -6,36 +6,45 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
 // CORS configuration
 const allowedOrigins = [
-    process.env.FRONTEND_URL,
-    process.env.ADMIN_URL,
+    'https://life-we-deserve-site.vercel.app',
     'https://admin-tlwd.vercel.app',
     'http://localhost:5173',
     'http://localhost:5174',
-    'http://localhost:5175',
     'http://localhost:3000',
     'http://localhost:8080',
 ];
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
+        // Allow requests with no origin
         if (!origin) return callback(null, true);
 
-        const isAllowed = allowedOrigins.includes(origin);
+        // Normalize origin
+        const normalizedOrigin = origin.trim().replace(/\/$/, "");
 
-        if (isAllowed) {
+        const isVercel = normalizedOrigin.endsWith('.vercel.app');
+        const isLocal = normalizedOrigin.includes('localhost') || normalizedOrigin.includes('127.0.0.1');
+        const isExplicitlyAllowed = allowedOrigins.includes(normalizedOrigin) ||
+            (process.env.FRONTEND_URL && normalizedOrigin === process.env.FRONTEND_URL.trim().replace(/\/$/, "")) ||
+            (process.env.ADMIN_URL && normalizedOrigin === process.env.ADMIN_URL.trim().replace(/\/$/, ""));
+
+        if (isVercel || isLocal || isExplicitlyAllowed) {
             callback(null, true);
         } else {
-            console.warn(`Blocked by CORS: ${origin}`);
-            // In development, you might want to allow everything, but for now we follow the strict list
-            // We return callback(null, false) instead of callback(new Error(...)) to avoid 500 errors
+            console.warn(`CORS REJECTED: ${origin}`);
             callback(null, false);
         }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+    maxAge: 86400
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
