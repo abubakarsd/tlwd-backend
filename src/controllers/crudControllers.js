@@ -20,8 +20,13 @@ const createCRUDController = (Model, modelName, folder, dbField = 'image', onCre
             const { page, limit } = req.query;
             const { skip, limit: limitNum, page: pageNum } = getPagination(page, limit);
 
+            let sort = { createdAt: -1 };
+            if (Model.modelName === 'ImpactStory') {
+                sort = { year: -1 };
+            }
+
             const items = await Model.find()
-                .sort({ createdAt: -1 })
+                .sort(sort)
                 .skip(skip)
                 .limit(limitNum);
 
