@@ -81,8 +81,8 @@ exports.initializeDonation = async (req, res) => {
             return errorResponse(res, 'Amount and email are required', 400);
         }
 
-        // Generate unique reference
-        const reference = `TLWD-${Date.now()}`;
+        // Generate unique reference (or use provided one)
+        const reference = req.body.reference || `TLWD-${Date.now()}`;
 
         // Create donation record
         const donation = await Donation.create({
