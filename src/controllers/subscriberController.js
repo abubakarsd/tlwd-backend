@@ -46,6 +46,55 @@ exports.deleteSubscriber = async (req, res) => {
     }
 };
 
+exports.importSubscribers = async (req, res) => {
+    try {
+        if (!req.file) {
+            return errorResponse(res, 'Please upload a CSV file', 400);
+        }
+
+        const csvData = req.file.buffer.toString('utf8');
+        const lines = csvData.split('\n');
+        const header = lines[0].split(',').map(h => h.trim().toLowerCase());
+
+        const emailIndex = header.indexOf('email');
+        const sourceIndex = header.indexOf('source');
+
+        if (emailIndex === -1) {
+            return errorResponse(res, 'CSV must contain an "email" column', 400);
+        }
+
+        const results = [];
+        let importedCount = 0;
+
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+
+            const values = line.split(',').map(v => v.trim());
+            const email = values[emailIndex];
+            const source = sourceIndex !== -1 ? values[sourceIndex] : 'CSV Import';
+
+            if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                let subscriber = await Subscriber.findOne({ email });
+
+                if (subscriber) {
+                    subscriber.status = 'Active';
+                    subscriber.source = source || subscriber.source;
+                    subscriber.subscribedAt = new Date();
+                    await subscriber.save();
+                } else {
+                    await Subscriber.create({ email, source });
+                }
+                importedCount++;
+            }
+        }
+
+        successResponse(res, { importedCount }, `Successfully imported ${importedCount} subscribers`);
+    } catch (error) {
+        errorResponse(res, error.message, 500);
+    }
+};
+
 exports.exportSubscribers = async (req, res) => {
     try {
         const subscribers = await Subscriber.find({ status: 'Active' })
