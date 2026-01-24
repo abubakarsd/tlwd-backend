@@ -33,6 +33,17 @@ const blogSchema = new mongoose.Schema({
     imagePublicId: {
         type: String,
     },
+    authorImage: {
+        type: String,
+    },
+    authorRole: {
+        type: String,
+        default: 'Contributor',
+    },
+    authorBio: {
+        type: String,
+        default: 'Dedicated to sharing stories of impact and change. Join us in making a difference in the world, one community at a time.',
+    },
     views: {
         type: Number,
         default: 0,

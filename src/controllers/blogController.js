@@ -41,7 +41,7 @@ exports.getBlogPosts = async (req, res) => {
  */
 exports.createBlogPost = async (req, res) => {
     try {
-        const { title, author, category, status, content } = req.body;
+        const { title, author, category, status, content, authorRole, authorBio, authorImage } = req.body;
 
         let imageData = {};
         if (req.file) {
@@ -58,6 +58,9 @@ exports.createBlogPost = async (req, res) => {
             category,
             status,
             content,
+            authorRole,
+            authorBio,
+            authorImage,
             ...imageData,
         });
 
@@ -101,7 +104,7 @@ exports.updateBlogPost = async (req, res) => {
             return errorResponse(res, 'Blog post not found', 404);
         }
 
-        const { title, author, category, status, content } = req.body;
+        const { title, author, category, status, content, authorRole, authorBio, authorImage } = req.body;
         const wasPublished = post.status === 'Published';
 
         if (req.file) {
@@ -118,6 +121,9 @@ exports.updateBlogPost = async (req, res) => {
         post.category = category || post.category;
         post.status = status || post.status;
         post.content = content || post.content;
+        post.authorRole = authorRole || post.authorRole;
+        post.authorBio = authorBio || post.authorBio;
+        post.authorImage = authorImage || post.authorImage;
 
         await post.save();
 
