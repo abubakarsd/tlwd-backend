@@ -148,6 +148,9 @@ const createCRUDController = (Model, modelName, folder, dbField = 'image', onCre
                 }
 
                 filter.status = { $in: [...new Set(statusList)] };
+                if (modelName === 'Opportunity') {
+                    console.log(`[DEBUG] getPublic Opportunity Filter:`, JSON.stringify(filter));
+                }
             }
             if (Model.schema.path('type') && req.query.type) {
                 filter.type = req.query.type;
