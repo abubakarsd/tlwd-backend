@@ -147,7 +147,13 @@ const createCRUDController = (Model, modelName, folder, dbField = 'image', onCre
                     statusList.push('Active', 'active', 'Published', 'published', 'Open', 'open');
                 }
 
-                filter.status = { $in: [...new Set(statusList)] };
+                if (modelName === 'Opportunity') {
+                    // TEMPORARY DEBUG: Disable status filter for Opportunity
+                    // filter.status = { $in: [...new Set(statusList)] };
+                    console.log(`[DEBUG] getPublic Opportunity Filter DISABLED status check`);
+                } else {
+                    filter.status = { $in: [...new Set(statusList)] };
+                }
                 if (modelName === 'Opportunity') {
                     console.log(`[DEBUG] getPublic Opportunity Filter:`, JSON.stringify(filter));
                 }
