@@ -52,3 +52,53 @@ exports.submitProjectComment = async (req, res) => {
         errorResponse(res, error.message, 500);
     }
 };
+
+/**
+ * @route   GET /api/admin/impact-stories/:id/comments
+ * @desc    Get all comments for a project (Admin)
+ * @access  Private/Admin
+ */
+exports.getAdminProjectComments = async (req, res) => {
+    try {
+        const comments = await Comment.find({ projectId: req.params.id }).sort({ createdAt: -1 });
+        successResponse(res, comments);
+    } catch (error) {
+        errorResponse(res, error.message, 500);
+    }
+};
+
+/**
+ * @route   PATCH /api/admin/impact-stories/:id/comments/:commentId/approve
+ * @desc    Approve project comment
+ * @access  Private/Admin
+ */
+exports.approveProjectComment = async (req, res) => {
+    try {
+        const comment = await Comment.findById(req.params.commentId);
+        if (!comment) return errorResponse(res, 'Comment not found', 404);
+
+        comment.status = 'approved';
+        await comment.save();
+
+        successResponse(res, comment, 'Comment approved successfully');
+    } catch (error) {
+        errorResponse(res, error.message, 500);
+    }
+};
+
+/**
+ * @route   DELETE /api/admin/impact-stories/:id/comments/:commentId
+ * @desc    Delete project comment
+ * @access  Private/Admin
+ */
+exports.deleteProjectComment = async (req, res) => {
+    try {
+        const comment = await Comment.findById(req.params.commentId);
+        if (!comment) return errorResponse(res, 'Comment not found', 404);
+
+        await comment.deleteOne();
+        successResponse(res, null, 'Comment deleted successfully');
+    } catch (error) {
+        errorResponse(res, error.message, 500);
+    }
+};

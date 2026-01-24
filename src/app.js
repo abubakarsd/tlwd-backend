@@ -73,7 +73,7 @@ app.use('/api/admin/impact-counts', createCRUDRoutes(impactCountController));
 app.use('/api/admin/priorities', createCRUDRoutes(priorityController)); // Add this
 app.use('/api/admin/values', createCRUDRoutes(valueController));
 app.use('/api/admin/testimonials', createCRUDRoutes(testimonialController));
-app.use('/api/admin/impact-stories', createCRUDRoutes(impactStoryController));
+app.use('/api/admin/impact-stories', require('./routes/admin/impactStories'));
 app.use('/api/admin/blog', require('./routes/admin/blog'));
 app.use('/api/admin/team', createCRUDRoutes(teamController));
 app.use('/api/admin/partners', createCRUDRoutes(partnerController, 'logo'));
