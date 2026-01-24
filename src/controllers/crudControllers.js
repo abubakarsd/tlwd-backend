@@ -121,10 +121,28 @@ const createCRUDController = (Model, modelName, folder, dbField = 'image', onCre
         try {
             const filter = {};
             if (Model.schema.path('status')) {
-                const defaultStatus = Model.modelName === 'Opportunity' ? 'Open' : 'Active';
+                // Determine the correct "active" status for this model
+                const modelName = Model.modelName;
+                let defaultStatus = 'Active';
+
+                if (modelName === 'Opportunity') defaultStatus = 'Open';
+                if (modelName === 'ImpactStory' || modelName === 'Blog') defaultStatus = 'Published';
+
                 const status = req.query.status || defaultStatus;
-                // Support both capitalized and lowercase for backward compatibility
-                filter.status = { $in: [status, status.toLowerCase()] };
+
+                // Construct a set of equivalent statuses (e.g., 'Published', 'published')
+                const statusList = [
+                    status,
+                    status.toLowerCase(),
+                    status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+                ];
+
+                // For public routes, if looking for Active/Published, also allow the lowercase versions
+                if (status.toLowerCase() === 'active' || status.toLowerCase() === 'published' || status.toLowerCase() === 'open') {
+                    statusList.push('Active', 'active', 'Published', 'published', 'Open', 'open');
+                }
+
+                filter.status = { $in: [...new Set(statusList)] };
             }
             if (Model.schema.path('type') && req.query.type) {
                 filter.type = req.query.type;
