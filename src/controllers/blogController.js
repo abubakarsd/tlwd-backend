@@ -244,11 +244,18 @@ exports.deleteComment = async (req, res) => {
  */
 exports.getPublicBlogPosts = async (req, res) => {
     try {
-        const { page, limit, category } = req.query;
+        const { page, limit, category, search } = req.query;
         const { skip, limit: limitNum, page: pageNum } = getPagination(page, limit);
 
         const filter = { status: 'Published' };
         if (category) filter.category = category;
+
+        if (search) {
+            filter.$or = [
+                { title: { $regex: search, $options: 'i' } },
+                { content: { $regex: search, $options: 'i' } }
+            ];
+        }
 
         const posts = await Blog.find(filter)
             .sort({ createdAt: -1 })
