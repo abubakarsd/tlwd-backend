@@ -93,7 +93,7 @@ app.use('/api/impact-counts', createPublicRoutes(impactCountController));
 app.use('/api/priorities', createPublicRoutes(priorityController)); // Add this
 app.use('/api/values', createPublicRoutes(valueController));
 app.use('/api/testimonials', createPublicRoutes(testimonialController));
-app.use('/api/impact-stories', createPublicRoutes(impactStoryController));
+app.use('/api/impact-stories', require('./routes/public/impactStories'));
 app.use('/api/blog', require('./routes/public/blog'));
 app.use('/api/team', createPublicRoutes(teamController));
 app.use('/api/partners', createPublicRoutes(partnerController));
