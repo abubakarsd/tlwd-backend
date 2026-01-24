@@ -120,26 +120,36 @@ exports.verifyDonation = async (req, res) => {
 
         // Verify with Paystack
         const verification = await verifyPayment(reference);
+        console.log(`[DEBUG] Verify Response for ${reference}:`, verification.data.status);
 
         // Update donation record
         const donation = await Donation.findOne({ reference });
 
         if (!donation) {
+            console.error(`[DEBUG] Donation NOT FOUND for reference: ${reference}`);
             return errorResponse(res, 'Donation not found', 404);
         }
+
+        console.log(`[DEBUG] Found Donation:`, donation._id, donation.status);
 
         donation.status = verification.data.status === 'success' ? 'Successful' : 'Failed';
         donation.paystackData = verification.data;
         await donation.save();
+        console.log(`[DEBUG] Donation Updated to:`, donation.status);
 
         // Send receipt email if successful
         if (donation.status === 'Successful') {
-            await sendDonationReceipt({
-                name: donation.name || 'Donor',
-                email: donation.email,
-                amount: donation.amount,
-                reference: donation.reference,
-            });
+            try {
+                await sendDonationReceipt({
+                    name: donation.name || 'Donor',
+                    email: donation.email,
+                    amount: donation.amount,
+                    reference: donation.reference,
+                });
+                console.log(`[DEBUG] Receipt Sent`);
+            } catch (emailErr) {
+                console.error(`[DEBUG] Email Error:`, emailErr);
+            }
         }
 
         successResponse(res, {

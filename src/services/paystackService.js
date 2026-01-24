@@ -43,6 +43,7 @@ const verifyPayment = async (reference) => {
         );
         return response.data;
     } catch (error) {
+        console.error(`[DEBUG] Paystack Verify Error for ${reference}:`, error.response?.data || error.message);
         throw error;
     }
 };
