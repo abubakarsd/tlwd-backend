@@ -18,6 +18,7 @@ const prioritySchema = new mongoose.Schema({
         type: String,
         enum: ['Active', 'Inactive'],
         default: 'Active',
+        set: (v) => v ? v.charAt(0).toUpperCase() + v.slice(1).toLowerCase() : 'Active'
     },
 }, {
     timestamps: true,
