@@ -69,19 +69,16 @@ exports.createBlogPost = async (req, res) => {
             try {
                 const subscribers = await Subscriber.find({ status: 'Active' });
                 if (subscribers.length > 0) {
-                    // Create excerpt from content (strip HTML and limit to 200 chars)
-                    const excerpt = content.replace(/<[^>]*>/g, '').substring(0, 200) + '...';
-
                     await sendNewsletterBroadcast({
-                        title,
-                        excerpt,
-                        slug: post.slug,
+                        title: `New Post: ${title}`,
+                        body: `<p>${content.replace(/<[^>]*>/g, '').substring(0, 300)}...</p>`,
+                        ctaText: 'Read Article',
+                        ctaUrl: `${process.env.FRONTEND_URL}/blog/${post._id}`,
                         subscribers,
                     });
                 }
             } catch (emailError) {
                 console.error('Newsletter send error:', emailError);
-                // Don't fail the request if email fails
             }
         }
 

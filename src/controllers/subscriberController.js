@@ -2,7 +2,7 @@ const Subscriber = require('../models/Subscriber');
 const { successResponse, errorResponse, paginatedResponse } = require('../utils/response');
 const { getPagination, getPaginationData } = require('../utils/pagination');
 const { exportToCSV } = require('../utils/csvExport');
-const { sendNewsletterWelcome } = require('../services/emailService');
+const { sendNewsletterWelcome, sendNewsletterBroadcast } = require('../services/emailService');
 
 /**
  * ADMIN ENDPOINTS
@@ -167,6 +167,33 @@ exports.unsubscribe = async (req, res) => {
         await subscriber.save();
 
         successResponse(res, null, 'Successfully unsubscribed');
+    } catch (error) {
+        errorResponse(res, error.message, 500);
+    }
+};
+exports.broadcastNewsletter = async (req, res) => {
+    try {
+        const { title, body, ctaText, ctaUrl } = req.body;
+
+        if (!title || !body) {
+            return errorResponse(res, 'Title and Body are required', 400);
+        }
+
+        const subscribers = await Subscriber.find({ status: 'Active' });
+
+        if (subscribers.length === 0) {
+            return errorResponse(res, 'No active subscribers found', 404);
+        }
+
+        const stats = await sendNewsletterBroadcast({
+            title,
+            body,
+            ctaText,
+            ctaUrl,
+            subscribers,
+        });
+
+        successResponse(res, stats, `Newsletter broadcasted successfully to ${stats.successful} subscribers`);
     } catch (error) {
         errorResponse(res, error.message, 500);
     }

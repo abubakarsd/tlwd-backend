@@ -14,7 +14,7 @@ const { getPagination, getPaginationData } = require('../utils/pagination');
 const { uploadImage, deleteImage, uploadMultipleImages } = require('../services/cloudinaryService');
 
 // Generic CRUD factory
-const createCRUDController = (Model, modelName, folder, dbField = 'image') => ({
+const createCRUDController = (Model, modelName, folder, dbField = 'image', onCreated = null) => ({
     getAll: async (req, res) => {
         try {
             const { page, limit } = req.query;
@@ -50,6 +50,15 @@ const createCRUDController = (Model, modelName, folder, dbField = 'image') => ({
             }
 
             const item = await Model.create({ ...req.body, ...imageData });
+
+            if (onCreated) {
+                try {
+                    await onCreated(item);
+                } catch (hookError) {
+                    console.error(`Error in onCreated hook for ${modelName}:`, hookError);
+                }
+            }
+
             successResponse(res, item, `${modelName} created successfully`, 201);
         } catch (error) {
             errorResponse(res, error.message, 500);
@@ -144,12 +153,30 @@ const createCRUDController = (Model, modelName, folder, dbField = 'image') => ({
     },
 });
 
+const Subscriber = require('../models/Subscriber');
+const { sendNewsletterBroadcast } = require('../services/emailService');
+
 // Export controllers for each model
 module.exports = {
     impactCountController: createCRUDController(ImpactCount, 'Impact Count', 'impact-counts'),
     teamController: createCRUDController(Team, 'Team Member', 'team'),
     partnerController: createCRUDController(Partner, 'Partner', 'partners'),
-    opportunityController: createCRUDController(Opportunity, 'Opportunity', 'opportunities'),
+    opportunityController: createCRUDController(Opportunity, 'Opportunity', 'opportunities', 'image', async (item) => {
+        try {
+            const subscribers = await Subscriber.find({ status: 'Active' });
+            if (subscribers.length > 0) {
+                await sendNewsletterBroadcast({
+                    title: `New Opportunity: ${item.title}`,
+                    body: `<p>A new ${item.type} opportunity is available at TLWD Foundation!</p><p>${item.description.substring(0, 200)}...</p>`,
+                    ctaText: 'View Opportunity',
+                    ctaUrl: `${process.env.FRONTEND_URL}/opportunities/${item._id}`,
+                    subscribers,
+                });
+            }
+        } catch (error) {
+            console.error('Email broadcast failed for opportunity:', error);
+        }
+    }),
     impactStoryController: createCRUDController(ImpactStory, 'Impact Story', 'impact-stories'),
     resourceController: createCRUDController(Resource, 'Resource', 'resources', 'file'),
     priorityController: createCRUDController(Priority, 'Priority', 'priorities'),

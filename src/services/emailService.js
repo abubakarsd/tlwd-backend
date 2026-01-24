@@ -1,12 +1,14 @@
 const resend = require('../config/resend');
 
+const FROM_EMAIL = `TLWD Foundation <${process.env.ADMIN_EMAIL || 'noreply@tlwdfoundation.org'}>`;
+
 /**
  * Send contact form email
  */
 const sendContactEmail = async ({ name, email, subject, message }) => {
     try {
         const result = await resend.emails.send({
-            from: 'TLWD Foundation <noreply@tlwd.org>',
+            from: FROM_EMAIL,
             to: process.env.ADMIN_EMAIL,
             subject: `Contact Form: ${subject}`,
             html: `
@@ -30,7 +32,7 @@ const sendContactEmail = async ({ name, email, subject, message }) => {
 const sendApplicationConfirmation = async ({ name, email, opportunityTitle }) => {
     try {
         const result = await resend.emails.send({
-            from: 'TLWD Foundation <noreply@tlwd.org>',
+            from: FROM_EMAIL,
             to: email,
             subject: 'Application Received - TLWD Foundation',
             html: `
@@ -55,7 +57,7 @@ const sendApplicationConfirmation = async ({ name, email, opportunityTitle }) =>
 const sendDonationReceipt = async ({ name, email, amount, reference }) => {
     try {
         const result = await resend.emails.send({
-            from: 'TLWD Foundation <noreply@tlwd.org>',
+            from: FROM_EMAIL,
             to: email,
             subject: 'Donation Receipt - TLWD Foundation',
             html: `
@@ -81,16 +83,18 @@ const sendDonationReceipt = async ({ name, email, amount, reference }) => {
 const sendNewsletterWelcome = async (email) => {
     try {
         const result = await resend.emails.send({
-            from: 'TLWD Foundation <noreply@tlwd.org>',
+            from: FROM_EMAIL,
             to: email,
             subject: 'Welcome to TLWD Foundation Newsletter',
             html: `
-        <h2>Welcome to our newsletter!</h2>
-        <p>Thank you for subscribing to TLWD Foundation's newsletter.</p>
-        <p>You'll receive updates about our programs, impact stories, and upcoming events.</p>
-        <br>
-        <p>Best regards,</p>
-        <p>TLWD Foundation Team</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; rounded: 10px;">
+          <h2 style="color: #4d7c0f;">Welcome to our newsletter!</h2>
+          <p>Thank you for subscribing to TLWD Foundation's newsletter.</p>
+          <p>You'll receive updates about our programs, impact stories, and upcoming events.</p>
+          <br>
+          <p>Best regards,</p>
+          <p><strong>TLWD Foundation Team</strong></p>
+        </div>
       `,
         });
         return result;
@@ -100,38 +104,43 @@ const sendNewsletterWelcome = async (email) => {
 };
 
 /**
- * Send newsletter broadcast for new blog post
+ * Send newsletter broadcast
  */
-const sendNewsletterBroadcast = async ({ title, excerpt, slug, subscribers }) => {
+const sendNewsletterBroadcast = async ({ title, body, ctaText, ctaUrl, subscribers }) => {
     try {
-        const blogUrl = `${process.env.FRONTEND_URL}/blog/${slug}`;
-
-        // Send to all subscribers (Resend supports batch sending)
         const emailPromises = subscribers.map(subscriber =>
             resend.emails.send({
-                from: 'TLWD Foundation <noreply@tlwd.org>',
+                from: FROM_EMAIL,
                 to: subscriber.email,
-                subject: `New Post: ${title}`,
+                subject: title,
                 html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333;">New Blog Post from TLWD Foundation</h2>
-            <h3 style="color: #0066cc;">${title}</h3>
-            <p style="color: #666; line-height: 1.6;">${excerpt}</p>
-            <a href="${blogUrl}" style="display: inline-block; padding: 12px 24px; background-color: #0066cc; color: white; text-decoration: none; border-radius: 5px; margin-top: 16px;">Read More</a>
-            <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;">
-            <p style="color: #999; font-size: 12px;">
-              You're receiving this email because you subscribed to TLWD Foundation's newsletter.
-              <br>
-              <a href="${process.env.FRONTEND_URL}/unsubscribe?email=${subscriber.email}" style="color: #999;">Unsubscribe</a>
-            </p>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #4d7c0f; padding: 20px; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 24px;">TLWD Foundation</h1>
+            </div>
+            <div style="padding: 30px; background-color: white;">
+              <h2 style="color: #333; margin-top: 0;">${title}</h2>
+              <div style="color: #555; line-height: 1.6; margin-bottom: 25px;">
+                ${body}
+              </div>
+              ${ctaUrl ? `
+                <div style="text-align: center;">
+                  <a href="${ctaUrl}" style="display: inline-block; padding: 12px 30px; background-color: #4d7c0f; color: white; text-decoration: none; border-radius: 30px; font-weight: bold;">
+                    ${ctaText || 'Read More'}
+                  </a>
+                </div>
+              ` : ''}
+            </div>
+            <div style="background-color: #f9f9f9; padding: 20px; text-align: center; color: #999; font-size: 12px;">
+              <p>You're receiving this because you subscribed to TLWD Foundation updates.</p>
+              <p><a href="${process.env.FRONTEND_URL}/unsubscribe" style="color: #999;">Unsubscribe</a></p>
+            </div>
           </div>
         `,
             })
         );
 
         const results = await Promise.allSettled(emailPromises);
-
-        // Count successful sends
         const successful = results.filter(r => r.status === 'fulfilled').length;
         const failed = results.filter(r => r.status === 'rejected').length;
 
