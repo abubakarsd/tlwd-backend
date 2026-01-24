@@ -102,6 +102,7 @@ app.use('/api/resources', createPublicRoutes(resourceController));
 app.use('/api/donations', require('./routes/public/donations'));
 app.use('/api/newsletter', require('./routes/public/newsletter'));
 app.use('/api/contact', require('./routes/public/contact'));
+app.use('/api/media', require('./routes/public/media'));
 
 
 // Health check
