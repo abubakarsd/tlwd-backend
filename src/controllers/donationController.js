@@ -120,7 +120,9 @@ exports.verifyDonation = async (req, res) => {
 
         // Verify with Paystack
         const verification = await verifyPayment(reference);
-        console.log(`[DEBUG] Verify Response for ${reference}:`, verification.data.status);
+        const pData = verification.data;
+
+        console.log(`[DEBUG] Verify Response for ${reference}:`, pData.status, pData.gateway_response);
 
         // Update donation record
         const donation = await Donation.findOne({ reference });
@@ -130,12 +132,17 @@ exports.verifyDonation = async (req, res) => {
             return errorResponse(res, 'Donation not found', 404);
         }
 
-        console.log(`[DEBUG] Found Donation:`, donation._id, donation.status);
+        // Map Paystack status to our status
+        // Paystack: success, failed, abandoned, reversed
+        let newStatus = 'Pending';
+        if (pData.status === 'success') newStatus = 'Successful';
+        else if (['failed', 'abandoned', 'reversed'].includes(pData.status)) newStatus = 'Failed';
+        else newStatus = 'Pending'; // e.g. 'ongoing'
 
-        donation.status = verification.data.status === 'success' ? 'Successful' : 'Failed';
-        donation.paystackData = verification.data;
+        donation.status = newStatus;
+        donation.paystackData = pData;
         await donation.save();
-        console.log(`[DEBUG] Donation Updated to:`, donation.status);
+        console.log(`[DEBUG] Donation Updated to: ${donation.status}`);
 
         // Send receipt email if successful
         if (donation.status === 'Successful') {
@@ -152,11 +159,25 @@ exports.verifyDonation = async (req, res) => {
             }
         }
 
-        successResponse(res, {
-            status: donation.status,
-            amount: donation.amount,
-        }, 'Payment verified successfully');
+        // Return appropriate response
+        if (donation.status === 'Successful') {
+            successResponse(res, {
+                status: donation.status,
+                amount: donation.amount,
+                reference: donation.reference
+            }, 'Payment verified successfully');
+        } else {
+            // Return 400 or 200 with failed status? 
+            // Better to return 200 but with status 'Failed' so frontend can handle gracefully
+            successResponse(res, {
+                status: donation.status,
+                message: pData.gateway_response || 'Payment not successful',
+                paystackStatus: pData.status
+            }, 'Payment verification complete: ' + (pData.gateway_response || pData.status));
+        }
+
     } catch (error) {
+        console.error('[DEBUG] Verify Error:', error);
         errorResponse(res, error.message, 500);
     }
 };
