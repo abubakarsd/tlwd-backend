@@ -1,6 +1,5 @@
 const express = require('express');
 const { starBizzProgramController } = require('../../controllers/crudControllers');
-const { protect, admin } = require('../../middleware/authMiddleware');
 const createCRUDRoutes = require('./crudRoutes');
 
 // Since programs don't need image upload for now (using lucide icon names), we can use generic route or simple one.
