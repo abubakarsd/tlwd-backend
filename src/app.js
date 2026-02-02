@@ -90,6 +90,7 @@ const starBizzImpactRoutes = require('./routes/admin/starBizzImpact');
 const starBizzProgramRoutes = require('./routes/admin/starBizzProgram');
 app.use('/api/admin/star-bizz-impact', starBizzImpactRoutes);
 app.use('/api/admin/star-bizz-program', starBizzProgramRoutes);
+app.use('/api/admin/star-bizz-partner', require('./routes/admin/starBizzPartner'));
 app.use('/api/admin/settings', require('./routes/admin/settings'));
 
 // Public routes
@@ -111,6 +112,7 @@ const publicStarBizzImpactRoutes = require('./routes/public/starBizzImpact');
 const publicStarBizzProgramRoutes = require('./routes/public/starBizzProgram');
 app.use('/api/star-bizz-impact', publicStarBizzImpactRoutes);
 app.use('/api/star-bizz-program', publicStarBizzProgramRoutes);
+app.use('/api/star-bizz-partner', require('./routes/public/starBizzPartner'));
 app.use('/api/contact', require('./routes/public/contact'));
 app.use('/api/media', require('./routes/public/media'));
 
