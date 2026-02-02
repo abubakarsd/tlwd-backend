@@ -10,6 +10,7 @@ const Value = require('../models/Value');
 const Testimonial = require('../models/Testimonial');
 const Media = require('../models/Media');
 const StarBizzImpact = require('../models/StarBizzImpact');
+const StarBizzProgram = require('../models/StarBizzProgram');
 const { successResponse, errorResponse, paginatedResponse } = require('../utils/response');
 const { getPagination, getPaginationData } = require('../utils/pagination');
 const { uploadImage, deleteImage, uploadMultipleImages } = require('../services/cloudinaryService');
@@ -216,4 +217,5 @@ module.exports = {
     valueController: createCRUDController(Value, 'Value', 'values'),
     testimonialController: createCRUDController(Testimonial, 'Testimonial', 'testimonials'),
     starBizzImpactController: createCRUDController(StarBizzImpact, 'StarBizz Impact', 'starbizz-impact'),
+    starBizzProgramController: createCRUDController(StarBizzProgram, 'StarBizz Program', 'starbizz-programs'),
 };

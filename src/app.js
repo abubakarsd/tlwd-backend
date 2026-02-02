@@ -84,7 +84,10 @@ app.use('/api/admin/resources', createCRUDRoutes(resourceController, 'file'));
 app.use('/api/admin/subscribers', require('./routes/admin/subscribers'));
 app.use('/api/admin/dashboard', require('./routes/admin/dashboard'));
 app.use('/api/admin/media', require('./routes/admin/media'));
-app.use('/api/admin/star-bizz-impact', require('./routes/admin/starBizzImpact'));
+const starBizzImpactRoutes = require('./routes/admin/starBizzImpact');
+const starBizzProgramRoutes = require('./routes/admin/starBizzProgram');
+app.use('/api/admin/star-bizz-impact', starBizzImpactRoutes);
+app.use('/api/admin/star-bizz-program', starBizzProgramRoutes);
 app.use('/api/admin/settings', require('./routes/admin/settings'));
 
 // Public routes
@@ -102,7 +105,10 @@ app.use('/api/opportunities', require('./routes/public/opportunities'));
 app.use('/api/resources', createPublicRoutes(resourceController));
 app.use('/api/donations', require('./routes/public/donations'));
 app.use('/api/newsletter', require('./routes/public/newsletter'));
-app.use('/api/star-bizz-impact', require('./routes/public/starBizzImpact'));
+const publicStarBizzImpactRoutes = require('./routes/public/starBizzImpact');
+const publicStarBizzProgramRoutes = require('./routes/public/starBizzProgram');
+app.use('/api/star-bizz-impact', publicStarBizzImpactRoutes);
+app.use('/api/star-bizz-program', publicStarBizzProgramRoutes);
 app.use('/api/contact', require('./routes/public/contact'));
 app.use('/api/media', require('./routes/public/media'));
 
