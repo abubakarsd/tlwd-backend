@@ -1,15 +1,15 @@
-const resend = require('../config/resend');
+const transporter = require('../config/nodemailer');
 
-const FROM_EMAIL = `TLWD Foundation <${process.env.ADMIN_EMAIL || 'noreply@tlwdfoundation.org'}>`;
+const FROM_EMAIL = `TLWD Foundation <${process.env.EMAIL_USER}>`;
 
 /**
  * Send contact form email
  */
 const sendContactEmail = async ({ name, email, subject, message }) => {
   try {
-    const result = await resend.emails.send({
+    const result = await transporter.sendMail({
       from: FROM_EMAIL,
-      to: process.env.ADMIN_EMAIL,
+      to: process.env.EMAIL_USER, // Send to admin (which is the same as sender in this case, or use a different admin email if available)
       subject: `Contact Form: ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
@@ -31,7 +31,7 @@ const sendContactEmail = async ({ name, email, subject, message }) => {
  */
 const sendApplicationConfirmation = async ({ name, email, opportunityTitle }) => {
   try {
-    const result = await resend.emails.send({
+    const result = await transporter.sendMail({
       from: FROM_EMAIL,
       to: email,
       subject: 'Application Received - TLWD Foundation',
@@ -56,7 +56,7 @@ const sendApplicationConfirmation = async ({ name, email, opportunityTitle }) =>
  */
 const sendDonationReceipt = async ({ name, email, amount, reference }) => {
   try {
-    const result = await resend.emails.send({
+    const result = await transporter.sendMail({
       from: FROM_EMAIL,
       to: email,
       subject: 'Donation Receipt - TLWD Foundation',
@@ -82,7 +82,7 @@ const sendDonationReceipt = async ({ name, email, amount, reference }) => {
  */
 const sendNewsletterWelcome = async (email) => {
   try {
-    const result = await resend.emails.send({
+    const result = await transporter.sendMail({
       from: FROM_EMAIL,
       to: email,
       subject: 'Welcome to TLWD Foundation Newsletter',
@@ -109,7 +109,7 @@ const sendNewsletterWelcome = async (email) => {
 const sendNewsletterBroadcast = async ({ title, body, ctaText, ctaUrl, subscribers }) => {
   try {
     const emailPromises = subscribers.map(subscriber =>
-      resend.emails.send({
+      transporter.sendMail({
         from: FROM_EMAIL,
         to: subscriber.email,
         subject: title,
