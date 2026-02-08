@@ -173,6 +173,7 @@ exports.unsubscribe = async (req, res) => {
 };
 exports.broadcastNewsletter = async (req, res) => {
     try {
+        console.log('Broadcast request received:', req.body);
         const { title, body, ctaText, ctaUrl } = req.body;
 
         if (!title || !body) {
@@ -180,6 +181,7 @@ exports.broadcastNewsletter = async (req, res) => {
         }
 
         const subscribers = await Subscriber.find({ status: 'Active' });
+        console.log(`Found ${subscribers.length} active subscribers for broadcast.`);
 
         if (subscribers.length === 0) {
             return errorResponse(res, 'No active subscribers found', 404);
@@ -193,8 +195,11 @@ exports.broadcastNewsletter = async (req, res) => {
             subscribers,
         });
 
+        console.log('Broadcast stats:', stats);
+
         successResponse(res, stats, `Newsletter broadcasted successfully to ${stats.successful} subscribers`);
     } catch (error) {
+        console.error('Broadcast error:', error);
         errorResponse(res, error.message, 500);
     }
 };
