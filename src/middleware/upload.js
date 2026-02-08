@@ -18,6 +18,7 @@ const fileFilter = (req, file, cb) => {
     if (mimetype && extname) {
         return cb(null, true);
     } else {
+        console.error(`File Upload Rejected: ${file.originalname}, MimeType: ${file.mimetype}`);
         cb(new Error('Invalid file type. Only JPEG, PNG, GIF, PDF, DOC, and DOCX are allowed.'));
     }
 };

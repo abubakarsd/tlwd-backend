@@ -1,6 +1,6 @@
 const resend = require('../config/resend');
 
-const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev';
+const FROM_EMAIL = `TLWD Foundation <${process.env.FROM_EMAIL || 'onboarding@resend.dev'}>`;
 
 /**
  * Send contact form email
