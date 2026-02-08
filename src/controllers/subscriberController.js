@@ -143,8 +143,8 @@ exports.subscribe = async (req, res) => {
             subscriber = await Subscriber.create({ email, source });
         }
 
-        // Send welcome email
-        await sendNewsletterWelcome(email);
+        // Send welcome email (non-blocking)
+        sendNewsletterWelcome(email).catch(err => console.error('Error sending welcome email:', err));
 
         successResponse(res, subscriber, 'Successfully subscribed to newsletter', 201);
     } catch (error) {
