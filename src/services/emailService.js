@@ -1,6 +1,6 @@
 const transporter = require('../config/nodemailer');
 
-const FROM_EMAIL = `TLWD Foundation <${process.env.EMAIL_USER}>`;
+const FROM_EMAIL = `TLWD Foundation <${process.env.EMAIL_SEND}>`;
 
 /**
  * Send contact form email
@@ -9,7 +9,7 @@ const sendContactEmail = async ({ name, email, subject, message }) => {
   try {
     const result = await transporter.sendMail({
       from: FROM_EMAIL,
-      to: process.env.EMAIL_USER, // Send to admin (which is the same as sender in this case, or use a different admin email if available)
+      to: process.env.EMAIL_SEND, // Send to admin (which is the same as sender in this case, or use a different admin email if available)
       subject: `Contact Form: ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
@@ -85,15 +85,68 @@ const sendNewsletterWelcome = async (email) => {
     const result = await transporter.sendMail({
       from: FROM_EMAIL,
       to: email,
-      subject: 'Welcome to TLWD Foundation Newsletter',
+      subject: 'Welcome to TLWD Foundation Newsletter! 🔔✨',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; rounded: 10px;">
-          <h2 style="color: #4d7c0f;">Welcome to our newsletter!</h2>
-          <p>Thank you for subscribing to TLWD Foundation's newsletter.</p>
-          <p>You'll receive updates about our programs, impact stories, and upcoming events.</p>
-          <br>
-          <p>Best regards,</p>
-          <p><strong>TLWD Foundation Team</strong></p>
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 0; color: #333333;">
+          
+          <!-- Header Image / Icon Area -->
+          <div style="text-align: center; padding: 40px 20px;">
+            <div style="display: inline-block; position: relative;">
+               <!-- Green Circle Background (Simulation with border-radius) -->
+               <div style="
+                  background-color: #4ade80; 
+                  width: 120px; 
+                  height: 120px; 
+                  border-radius: 50%; 
+                  margin: 0 auto;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+               ">
+                  <!-- Bell Icon -->
+                  <img src="https://cdn-icons-png.flaticon.com/512/1157/1157000.png" alt="Bell" style="width: 60px; height: 60px; display: block; margin: 30px auto;" />
+               </div>
+            </div>
+          </div>
+
+          <!-- Main Content -->
+          <div style="text-align: center; padding: 0 30px 40px;">
+            <h1 style="color: #1a1a1a; font-size: 24px; font-weight: bold; margin-bottom: 20px;">Welcome to the family! 🎉</h1>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #4b5563; margin-bottom: 24px;">
+              TLWD Foundation is thrilled to have you join us! You've successfully subscribed to our newsletter.
+            </p>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #4b5563; margin-bottom: 30px;">
+              Get ready for updates on our latest programs, impact stories, and opportunities to make a difference. We are stronger together! 💪
+            </p>
+
+            <!-- Call to Action Button -->
+            <a href="${process.env.FRONTEND_URL || '#'}" style="
+              display: inline-block;
+              background-color: #2563eb;
+              color: #ffffff;
+              font-size: 16px;
+              font-weight: bold;
+              text-decoration: none;
+              padding: 16px 32px;
+              border-radius: 8px;
+              box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+            ">
+              Visit Website
+            </a>
+
+            <p style="margin-top: 40px; font-size: 14px; color: #9ca3af;">
+              If you have any questions, feel free to reply to this email.
+            </p>
+          </div>
+
+          <!-- Footer -->
+          <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+             <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+               © ${new Date().getFullYear()} TLWD Foundation. All rights reserved.
+             </p>
+          </div>
         </div>
       `,
     });
