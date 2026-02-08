@@ -1,4 +1,9 @@
 require('dotenv').config();
+const dns = require('dns');
+
+// Force IPv4
+dns.setDefaultResultOrder('ipv4first');
+
 const app = require('./src/app');
 const connectDB = require('./src/config/database');
 const transporter = require('./src/config/nodemailer');
