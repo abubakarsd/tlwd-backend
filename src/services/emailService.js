@@ -163,7 +163,10 @@ const sendNewsletterWelcome = async (email) => {
 /**
  * Send newsletter broadcast
  */
-const sendNewsletterBroadcast = async ({ title, body, ctaText, ctaUrl, subscribers }) => {
+/**
+ * Send newsletter broadcast
+ */
+const sendNewsletterBroadcast = async ({ title, body, ctaText, ctaUrl, image, subscribers }) => {
   try {
     // Resend has rate limits, so we process in batches if needed. 
     // For simplicity, we map over subscribers. In production, use queue/batching.
@@ -177,6 +180,11 @@ const sendNewsletterBroadcast = async ({ title, body, ctaText, ctaUrl, subscribe
             <div style="background-color: #4d7c0f; padding: 20px; text-align: center;">
               <h1 style="color: white; margin: 0; font-size: 24px;">TLWD Foundation</h1>
             </div>
+            ${image ? `
+              <div style="width: 100%; max-height: 300px; overflow: hidden;">
+                <img src="${image}" alt="${title}" style="width: 100%; height: auto; object-fit: cover;" />
+              </div>
+            ` : ''}
             <div style="padding: 30px; background-color: white;">
               <h2 style="color: #333; margin-top: 0; font-size: 22px;">${title}</h2>
               <div style="color: #444; line-height: 1.6; margin-bottom: 25px; font-size: 16px;">

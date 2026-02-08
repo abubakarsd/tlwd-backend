@@ -74,6 +74,7 @@ exports.createBlogPost = async (req, res) => {
                         body: `<p>${content.replace(/<[^>]*>/g, '').substring(0, 300)}...</p>`,
                         ctaText: 'Read Article',
                         ctaUrl: `${process.env.FRONTEND_URL}/blog/${post._id}`,
+                        image: post.image,
                         subscribers,
                     });
                 }
@@ -135,6 +136,7 @@ exports.updateBlogPost = async (req, res) => {
                         title: post.title,
                         excerpt,
                         slug: post.slug,
+                        image: post.image,
                         subscribers,
                     });
                 }

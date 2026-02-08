@@ -205,6 +205,7 @@ module.exports = {
                     body: `<p>A new ${item.type} opportunity is available at TLWD Foundation!</p><p>${item.description.substring(0, 200)}...</p>`,
                     ctaText: 'View Opportunity',
                     ctaUrl: `${process.env.FRONTEND_URL}/opportunities/${item._id}`,
+                    image: item.image,
                     subscribers,
                 });
             }
@@ -218,6 +219,22 @@ module.exports = {
     valueController: createCRUDController(Value, 'Value', 'values'),
     testimonialController: createCRUDController(Testimonial, 'Testimonial', 'testimonials'),
     starBizzImpactController: createCRUDController(StarBizzImpact, 'StarBizz Impact', 'starbizz-impact'),
-    starBizzProgramController: createCRUDController(StarBizzProgram, 'StarBizz Program', 'starbizz-programs'),
+    starBizzProgramController: createCRUDController(StarBizzProgram, 'StarBizz Program', 'starbizz-programs', 'image', async (item) => {
+        try {
+            const subscribers = await Subscriber.find({ status: 'Active' });
+            if (subscribers.length > 0) {
+                await sendNewsletterBroadcast({
+                    title: `New StarBizz Program: ${item.title}`,
+                    body: `<p>A new program has been added to StarBizz!</p><p>${item.description.substring(0, 200)}...</p>`,
+                    ctaText: 'View Program',
+                    ctaUrl: `${process.env.FRONTEND_URL}/startbizzlab`, // Or specific program URL if available
+                    image: item.image,
+                    subscribers,
+                });
+            }
+        } catch (error) {
+            console.error('Email broadcast failed for StarBizz Program:', error);
+        }
+    }),
     starBizzPartnerController: createCRUDController(StarBizzPartner, 'StarBizz Partner', 'starbizz-partners', 'logo'),
 };

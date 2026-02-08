@@ -84,12 +84,19 @@ exports.importSubscribers = async (req, res) => {
                     await subscriber.save();
                 } else {
                     await Subscriber.create({ email, source });
+                    // Send welcome email to new subscribers
+                    // We can either await here or collect and send later. 
+                    // To avoid blocking the import too much, we'll fire and forget individually or batch.
+                    // Given previous timeout issues, fire-and-forget per user is safest for the response time,
+                    // but we might hit rate limits. 
+                    // Let's use the non-blocking pattern used in subscribe endpoint.
+                    sendNewsletterWelcome(email).catch(err => console.error(`Error sending welcome email to imported user ${email}:`, err));
                 }
                 importedCount++;
             }
         }
 
-        successResponse(res, { importedCount }, `Successfully imported ${importedCount} subscribers`);
+        successResponse(res, { importedCount }, `Successfully imported ${importedCount} subscribers. Welcome emails are being sent in the background.`);
     } catch (error) {
         errorResponse(res, error.message, 500);
     }
