@@ -1,15 +1,15 @@
-const transporter = require('../config/nodemailer');
+const resend = require('../config/resend');
 
-const FROM_EMAIL = `TLWD Foundation <${process.env.EMAIL_SEND}>`;
+const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev';
 
 /**
  * Send contact form email
  */
 const sendContactEmail = async ({ name, email, subject, message }) => {
   try {
-    const result = await transporter.sendMail({
+    const data = await resend.emails.send({
       from: FROM_EMAIL,
-      to: process.env.EMAIL_SEND, // Send to admin (which is the same as sender in this case, or use a different admin email if available)
+      to: process.env.EMAIL_SEND || 'contact@tlwdfoundation.org', // Send to admin
       subject: `Contact Form: ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>
@@ -20,8 +20,9 @@ const sendContactEmail = async ({ name, email, subject, message }) => {
         <p>${message}</p>
       `,
     });
-    return result;
+    return data;
   } catch (error) {
+    console.error('Resend Error:', error);
     throw error;
   }
 };
@@ -31,7 +32,7 @@ const sendContactEmail = async ({ name, email, subject, message }) => {
  */
 const sendApplicationConfirmation = async ({ name, email, opportunityTitle }) => {
   try {
-    const result = await transporter.sendMail({
+    const data = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: 'Application Received - TLWD Foundation',
@@ -45,8 +46,9 @@ const sendApplicationConfirmation = async ({ name, email, opportunityTitle }) =>
         <p>TLWD Foundation Team</p>
       `,
     });
-    return result;
+    return data;
   } catch (error) {
+    console.error('Resend Error:', error);
     throw error;
   }
 };
@@ -56,7 +58,7 @@ const sendApplicationConfirmation = async ({ name, email, opportunityTitle }) =>
  */
 const sendDonationReceipt = async ({ name, email, amount, reference }) => {
   try {
-    const result = await transporter.sendMail({
+    const data = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: 'Donation Receipt - TLWD Foundation',
@@ -71,8 +73,9 @@ const sendDonationReceipt = async ({ name, email, amount, reference }) => {
         <p>TLWD Foundation Team</p>
       `,
     });
-    return result;
+    return data;
   } catch (error) {
+    console.error('Resend Error:', error);
     throw error;
   }
 };
@@ -82,7 +85,7 @@ const sendDonationReceipt = async ({ name, email, amount, reference }) => {
  */
 const sendNewsletterWelcome = async (email) => {
   try {
-    const result = await transporter.sendMail({
+    const data = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       subject: 'Welcome to TLWD Foundation Newsletter! 🔔✨',
@@ -150,8 +153,9 @@ const sendNewsletterWelcome = async (email) => {
         </div>
       `,
     });
-    return result;
+    return data;
   } catch (error) {
+    console.error('Resend Error:', error);
     throw error;
   }
 };
@@ -161,8 +165,10 @@ const sendNewsletterWelcome = async (email) => {
  */
 const sendNewsletterBroadcast = async ({ title, body, ctaText, ctaUrl, subscribers }) => {
   try {
+    // Resend has rate limits, so we process in batches if needed. 
+    // For simplicity, we map over subscribers. In production, use queue/batching.
     const emailPromises = subscribers.map(subscriber =>
-      transporter.sendMail({
+      resend.emails.send({
         from: FROM_EMAIL,
         to: subscriber.email,
         subject: title,
@@ -199,6 +205,7 @@ const sendNewsletterBroadcast = async ({ title, body, ctaText, ctaUrl, subscribe
 
     return { successful, failed, total: subscribers.length };
   } catch (error) {
+    console.error('Resend Error:', error);
     throw error;
   }
 };
