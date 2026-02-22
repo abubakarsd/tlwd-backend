@@ -130,6 +130,8 @@ app.get('/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
 });
 
+const cloudinary = require('./config/cloudinary');
+
 // PDF Proxy to bypass Cloudinary 401 errors for raw files
 app.get('/api/proxy/pdf', async (req, res) => {
     const { url } = req.query;
@@ -143,9 +145,37 @@ app.get('/api/proxy/pdf', async (req, res) => {
     }
 
     try {
+        // Extract public ID from the URL
+        // Example: https://res.cloudinary.com/dgkd4huz8/image/upload/v1769121384/resources/y7tzei9j8thkddw5vhag.pdf
+        const urlObj = new URL(url);
+        const pathParts = urlObj.pathname.split('/');
+
+        // Public ID is everything after /upload/v<timestamp>/ or /upload/
+        const uploadIndex = pathParts.indexOf('upload');
+        if (uploadIndex === -1) {
+            return res.status(400).json({ error: 'Invalid Cloudinary URL structure' });
+        }
+
+        let publicIdParts;
+        if (pathParts[uploadIndex + 1] && pathParts[uploadIndex + 1].startsWith('v') && !isNaN(pathParts[uploadIndex + 1].substring(1))) {
+            publicIdParts = pathParts.slice(uploadIndex + 2);
+        } else {
+            publicIdParts = pathParts.slice(uploadIndex + 1);
+        }
+
+        const publicIdWithExt = publicIdParts.join('/');
+        const publicId = publicIdWithExt.replace(/\.[^/.]+$/, ""); // strip extension
+
+        // Generate a signed download URL using the Cloudinary SDK
+        const signedUrl = cloudinary.utils.private_download_url(publicId, 'pdf', {
+            resource_type: 'image',
+            type: 'upload'
+        });
+
+        // Fetch from the signed URL
         const response = await axios({
             method: 'get',
-            url: url,
+            url: signedUrl,
             responseType: 'stream'
         });
 
