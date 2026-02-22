@@ -134,7 +134,7 @@ const cloudinary = require('./config/cloudinary');
 
 // PDF Proxy to bypass Cloudinary 401 errors for raw files
 app.get('/api/proxy/pdf', async (req, res) => {
-    const { url } = req.query;
+    const { url, download } = req.query;
 
     if (!url) {
         return res.status(400).json({ error: 'URL is required' });
@@ -164,6 +164,7 @@ app.get('/api/proxy/pdf', async (req, res) => {
         }
 
         const publicIdWithExt = publicIdParts.join('/');
+        const filename = publicIdWithExt.split('/').pop() || 'document.pdf';
         const publicId = publicIdWithExt.replace(/\.[^/.]+$/, ""); // strip extension
 
         // Generate a signed download URL using the Cloudinary SDK
@@ -181,6 +182,13 @@ app.get('/api/proxy/pdf', async (req, res) => {
 
         // Set correct content type
         res.setHeader('Content-Type', 'application/pdf');
+
+        // Handle download disposition if requested
+        if (download === 'true') {
+            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        } else {
+            res.setHeader('Content-Disposition', 'inline');
+        }
 
         // Explicitly remove X-Frame-Options to allow iframe embedding
         res.removeHeader('X-Frame-Options');
