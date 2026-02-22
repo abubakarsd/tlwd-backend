@@ -6,18 +6,6 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// Middleware
-app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-    contentSecurityPolicy: {
-        directives: {
-            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-            "frame-ancestors": ["'self'", ...allowedOrigins],
-        },
-    },
-    frameguard: false, // Allow iframes for PDF viewing
-}));
-
 // CORS configuration
 const allowedOrigins = [
     'https://life-we-deserve-site.vercel.app',
@@ -29,6 +17,18 @@ const allowedOrigins = [
     'https://www.tlwdfoundation.org',
     'https://tlwdfoundation.org',
 ];
+
+// Middleware
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "frame-ancestors": ["'self'", ...allowedOrigins],
+        },
+    },
+    frameguard: false, // Allow iframes for PDF viewing
+}));
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -151,6 +151,9 @@ app.get('/api/proxy/pdf', async (req, res) => {
 
         // Set correct content type
         res.setHeader('Content-Type', 'application/pdf');
+
+        // Explicitly remove X-Frame-Options to allow iframe embedding
+        res.removeHeader('X-Frame-Options');
 
         // Pass through from Cloudinary
         response.data.pipe(res);
