@@ -1,13 +1,21 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const axios = require('axios');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
 // Middleware
 app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" }
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "frame-ancestors": ["'self'", ...allowedOrigins],
+        },
+    },
+    frameguard: false, // Allow iframes for PDF viewing
 }));
 
 // CORS configuration
@@ -120,6 +128,36 @@ app.use('/api/media', require('./routes/public/media'));
 // Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
+});
+
+// PDF Proxy to bypass Cloudinary 401 errors for raw files
+app.get('/api/proxy/pdf', async (req, res) => {
+    const { url } = req.query;
+
+    if (!url) {
+        return res.status(400).json({ error: 'URL is required' });
+    }
+
+    if (!url.includes('cloudinary.com')) {
+        return res.status(400).json({ error: 'Only Cloudinary URLs are allowed' });
+    }
+
+    try {
+        const response = await axios({
+            method: 'get',
+            url: url,
+            responseType: 'stream'
+        });
+
+        // Set correct content type
+        res.setHeader('Content-Type', 'application/pdf');
+
+        // Pass through from Cloudinary
+        response.data.pipe(res);
+    } catch (error) {
+        console.error('PDF Proxy Error:', error.message);
+        res.status(error.response?.status || 500).json({ error: 'Failed to fetch PDF from source' });
+    }
 });
 
 // Error handler (must be last)
