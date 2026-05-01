@@ -10,6 +10,8 @@ const app = express();
 const allowedOrigins = [
     'https://life-we-deserve-site.vercel.app',
     'https://admin-tlwd.vercel.app',
+    'https://life-we-deserve-site.onrender.com',
+    'https://admin-tlwd.onrender.com',
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
@@ -39,12 +41,13 @@ app.use(cors({
         const normalizedOrigin = origin.trim().replace(/\/$/, "");
 
         const isVercel = normalizedOrigin.endsWith('.vercel.app');
+        const isRender = normalizedOrigin.endsWith('.onrender.com');
         const isLocal = normalizedOrigin.includes('localhost') || normalizedOrigin.includes('127.0.0.1');
         const isExplicitlyAllowed = allowedOrigins.includes(normalizedOrigin) ||
             (process.env.FRONTEND_URL && normalizedOrigin === process.env.FRONTEND_URL.trim().replace(/\/$/, "")) ||
             (process.env.ADMIN_URL && normalizedOrigin === process.env.ADMIN_URL.trim().replace(/\/$/, ""));
 
-        if (isVercel || isLocal || isExplicitlyAllowed) {
+        if (isVercel || isRender || isLocal || isExplicitlyAllowed) {
             callback(null, true);
         } else {
             console.warn(`CORS REJECTED: ${origin}`);
